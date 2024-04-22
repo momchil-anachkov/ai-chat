@@ -6,7 +6,7 @@ import {
     WebSocketGateway,
 } from '@nestjs/websockets';
 import WebSocket from 'ws';
-import {ChatMessage, WsMessage, WsMessageSchema} from './chat.types';
+import {ChatMessage, IncomingMessage, IncomingMessageSchema} from './chat.types';
 import {Logger} from '@nestjs/common';
 import {LanguageModelService} from '../language-model/language-model.service';
 import {ChatRepository} from '../persistence/chat/chat.repository';
@@ -27,45 +27,55 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('chat-message')
-    async onEvent(client: WebSocket, message: WsMessage): Promise<void> {
+    async processChatMessage(client: WebSocket, rawMessage: IncomingMessage): Promise<void> {
         try {
-            const parseResult: any = WsMessageSchema.safeParse(message);
+            const parseResult: any = IncomingMessageSchema.safeParse(rawMessage);
             if (!parseResult.success) {
                 this.logger.warn(parseResult.error);
                 return;
             }
 
-            const chatMessage: ChatMessage = {
-                room: message.room,
-                username: message.message.user,
-                role: ChatRoles.USER,
-                text: message.message.text,
-            };
+            const message = parseResult.data;
 
-            await this.addMessageToChatRoom(chatMessage);
+            await this.processHumanMessage(message);
 
-            for (const connectedClient of this.connectedClients) {
-                connectedClient.send(JSON.stringify({ event: CHAT_MESSAGE, data: chatMessage }));
-            }
-
-            if (message.room === 'robots') {
-                const conversationSoFar: ChatMessage[] = this.roomToChatMessages.get('robots');
-
-                const aiResponse = await this.languageModel.respondInConversation(conversationSoFar);
-                const aiChatMessage: ChatMessage = {
-                    room: message.room,
-                    username: 'AI Assistant',
-                    role: ChatRoles.ASSISTANT,
-                    text: aiResponse,
-                };
-                await this.addMessageToChatRoom(aiChatMessage);
-
-                for (const client of this.connectedClients) {
-                    this.sendMessage(client, { event: CHAT_MESSAGE, data: aiChatMessage });
-                }
+            if (message.room === ChatRoomNames.ROBOTS) {
+                await this.respondWithAssistantMessage();
             }
         } catch (e) {
             this.logger.error(e.stack);
+        }
+    }
+
+    async processHumanMessage(incomingMessage: IncomingMessage) {
+        const chatMessage: ChatMessage = {
+            room: incomingMessage.room,
+            username: incomingMessage.username,
+            text: incomingMessage.text,
+            role: ChatRoles.USER,
+        };
+
+        await this.addMessageToChatRoom(chatMessage);
+
+        for (const client of this.connectedClients) {
+            this.sendMessage(client, { event: CHAT_MESSAGE, data: chatMessage });
+        }
+    }
+
+    async respondWithAssistantMessage() {
+        const conversationSoFar: ChatMessage[] = this.roomToChatMessages.get(ChatRoomNames.ROBOTS);
+
+        const aiResponse = await this.languageModel.respondInConversation(conversationSoFar);
+        const aiChatMessage: ChatMessage = {
+            room: ChatRoomNames.ROBOTS,
+            username: 'AI Assistant',
+            role: ChatRoles.ASSISTANT,
+            text: aiResponse,
+        };
+        await this.addMessageToChatRoom(aiChatMessage);
+
+        for (const client of this.connectedClients) {
+            this.sendMessage(client, { event: CHAT_MESSAGE, data: aiChatMessage });
         }
     }
 
