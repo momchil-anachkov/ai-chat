@@ -19,6 +19,7 @@ A basic chat app with some AI functionality
 
 ### Development & Tooling Roadmap
 - 🟨 Properly set up TypeScript for a monorepo. Having duplicate types and different TypeScript versions between the UI and API is really annoying. IDEs get quite-confused.
+- 🟨 Same thing for eslint. Formatting is kind of sketchy right now.
 - 🟨 HTTPS for the UI
 - 🟨 Proper logging system with different logging levels and output targets.
 
