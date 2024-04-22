@@ -29,8 +29,8 @@ A basic chat app with some AI functionality
 
 A basic docker-compose structure, with a few containers
 
-- UI - `~/packages/frontend`. This is our React UI. Access it on `localhost:${FRONTEND_PORT}`
-- API - `~/packages/backend`. This is our Nest Backend. Access it on `localhost:${BACKEND_PORT}`
+- UI - `~/packages/frontend`. This is our React UI. Access it on `http://localhost:${FRONTEND_PORT}`
+- API - `~/packages/backend`. This is our Nest Backend. Access it on `https://localhost:${BACKEND_PORT}`
 - postgres-db. A Postgres instance. Access it on port `${DB_PORT}`
 - pgadmin - A Posgres Admin web UI. `localhost:${PGADMIN_PORT}`.
 
