@@ -56,7 +56,7 @@ function Home() {
             JSON.stringify({
                 event: 'chat-message',
                 data: {
-                    room: 'humans',
+                    room,
                     username,
                     text: message,
                 },
