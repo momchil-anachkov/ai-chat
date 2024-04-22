@@ -1,12 +1,9 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import OpenAI from 'openai';
 import {ChatMessage} from '../chat/chat.types';
-import {
-    ChatCompletionAssistantMessageParam,
-    ChatCompletionMessageParam,
-    ChatCompletionUserMessageParam
-} from 'openai/resources';
 import {ChatCompletionCreateParamsNonStreaming} from 'openai/src/resources/chat/completions';
+
+const CONFUSED_RESPONSE = `I'm a little dizzy right now, because my servers are experiencing issues. Please, come back a little later and I'll do my best to answer you then.`;
 
 @Injectable()
 export class LanguageModelService {
@@ -14,18 +11,30 @@ export class LanguageModelService {
         apiKey: process.env.AI_API_KEY
     });
 
-    constructor() {
+    constructor(
+        private readonly logger: Logger,
+    ) {
     }
 
     async respondInConversation(previousMessages: ChatMessage[]): Promise<string> {
-        const messages = previousMessages.map((m) => ({ role: m.role, content: m.text }));
+        try {
+            const messages = previousMessages.map((m) => ({ role: m.role, content: m.text }));
 
-        const completion = await this.openAi.chat.completions.create({
-            messages,
-            model: 'gpt-3.5-turbo',
-        } as ChatCompletionCreateParamsNonStreaming);
+            const completion = await this.openAi.chat.completions.create({
+                messages,
+                model: 'gpt-3.5-turbo',
+            } as ChatCompletionCreateParamsNonStreaming);
 
-        // FIXME: Handling weird return values from the API
-        return completion.choices[0].message.content;
+            const completeResponse = completion.choices.find((choice) => choice.finish_reason === 'stop');
+
+            if (!completeResponse) {
+                return CONFUSED_RESPONSE;
+            }
+
+            return completeResponse.message.content;
+        } catch (e) {
+            this.logger.error(e.stack);
+            return CONFUSED_RESPONSE;
+        }
     }
 }

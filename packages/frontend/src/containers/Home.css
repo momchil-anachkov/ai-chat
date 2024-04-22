@@ -15,7 +15,6 @@
 
 .username {
     grid-area: username;
-    /*FIXME: We have duplicate css values. (Like Below) Use CSS variables.*/
     color: var(--user-username-color);
 }
 
