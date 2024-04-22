@@ -16,6 +16,7 @@ A basic chat app with some AI functionality
 - 🟨 Proper User Signup & Login
 - 🟨 User Chatroom Creation & Management
 - 🟨 Browser Notifications
+- 🟨 Nicer user experience during request-response cycle. Loading spinners, etc.
 
 ### Development & Tooling Roadmap
 - 🟨 Properly set up TypeScript for a monorepo. Having duplicate types and different TypeScript versions between the UI and API is really annoying. IDEs get quite-confused.
