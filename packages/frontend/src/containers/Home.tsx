@@ -64,27 +64,25 @@ function Home() {
     }
 
     return (
-        <React.Fragment>
-            <div className="Home">
-                <div className="username-box"><span className="username">Username</span>: {username}</div>
-                <div className="chatroom-humans">
-                    <ChatRoom
-                        watermark="humans"
-                        roomId="humans"
-                        onMessageSend={sendChatMessage}
-                        messages={chatRoomsState.humans}
-                    ></ChatRoom>
-                </div>
-                <div className="chatroom-robots">
-                    <ChatRoom
-                        watermark="humans & robots"
-                        roomId="robots"
-                        onMessageSend={sendChatMessage}
-                        messages={chatRoomsState.robots}
-                    ></ChatRoom>
-                </div>
+        <div className="Home">
+            <div className="username-box"><span className="username">Username</span>: {username}</div>
+            <div className="chatroom-humans">
+                <ChatRoom
+                    watermark="humans"
+                    roomId="humans"
+                    onMessageSend={sendChatMessage}
+                    messages={chatRoomsState.humans}
+                ></ChatRoom>
             </div>
-        </React.Fragment>
+            <div className="chatroom-robots">
+                <ChatRoom
+                    watermark="humans & robots"
+                    roomId="robots"
+                    onMessageSend={sendChatMessage}
+                    messages={chatRoomsState.robots}
+                ></ChatRoom>
+            </div>
+        </div>
     );
 }
 
