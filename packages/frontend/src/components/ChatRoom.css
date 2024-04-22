@@ -1,0 +1,72 @@
+.ChatRoom {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: #2C2C2C;
+}
+
+.messages-box-container {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.watermark {
+    text-transform: uppercase;
+    font-size: 9rem;
+    color: #DEE3E5;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotateZ(-45deg);
+    opacity: 0.02;
+    text-align: center;
+    pointer-events: none;
+}
+
+.messages-box {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 0 1rem;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #DEE3E5;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.messages-box .message-line {
+    padding: .2rem 0;
+}
+
+.messages-box .user {
+    color: #55B6C4;
+}
+
+.messages-box .assistant {
+    color: #D3835C;
+}
+
+.chat-box {
+    height: 9rem;
+    padding: 1rem;
+    position: relative;
+}
+
+.chat-box textarea {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    border: 1px solid #727879;
+    color: #DEE3E5;
+}
+
+.chat-box button {
+    position: absolute;
+    right: 2rem;
+    top: 2rem;
+}
+
+

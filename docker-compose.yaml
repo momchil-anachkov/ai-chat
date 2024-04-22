@@ -20,7 +20,9 @@ services:
       context: ./packages/backend
       dockerfile: Dockerfile.local
     restart: always
-    env_file: .env
+    env_file:
+      - .env
+      - .secrets
     volumes:
       - ./packages/backend:/svr/app
       - "./scripts/wait.sh:/wait.sh"
@@ -30,6 +32,8 @@ services:
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
       - 9229:9229
+      - 4001:4001
+      - 4002:4002
     depends_on:
       - bp-pg-db
     links:
@@ -48,6 +52,7 @@ services:
     ports:
       - "${DB_PORT}:${DB_PORT}"
     volumes:
+      - ./packages/database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pgdata:/var/lib/postgresql/data
     networks:
       - bp-network
