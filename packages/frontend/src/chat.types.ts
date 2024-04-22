@@ -4,6 +4,7 @@ interface WsMessage {
 }
 
 export interface ChatMessage {
+    room: string;
     username: string;
     role: string;
     text: string;

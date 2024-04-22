@@ -31,7 +31,6 @@
     height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
-    color: #DEE3E5;
     display: flex;
     flex-direction: column;
     justify-content: end;
@@ -42,11 +41,11 @@
 }
 
 .messages-box .user {
-    color: #55B6C4;
+    color: var(--user-username-color);
 }
 
 .messages-box .assistant {
-    color: #D3835C;
+    color: var(--assistant-username-color);
 }
 
 .chat-box {

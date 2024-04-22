@@ -1,18 +1,28 @@
-import React, {ChangeEvent, FormEvent, useRef, useState} from 'react';
+import React, {FormEvent, KeyboardEvent, useRef} from 'react';
 import './ChatRoom.css';
 import {ChatMessage} from '../chat.types';
 
 function ChatRoom(props: ChatRoomProps) {
-    console.log(`chatroom render ${props}`)
-
     const textareaRef = useRef<HTMLTextAreaElement>(null as unknown as HTMLTextAreaElement);
+    const formRef = useRef<HTMLFormElement>(null as unknown as HTMLFormElement);
 
-    function onSubmit(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    function sendMessage() {
         const textArea = textareaRef.current;
         const currentMessage = textArea.value;
         props.onMessageSend(props.roomId, currentMessage);
         textArea.value = '';
+    }
+
+    function onSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        sendMessage();
+    }
+
+    function sendOnEnterKey(e: KeyboardEvent<HTMLTextAreaElement>) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Don't write a newline in the textarea
+            sendMessage();
+        }
     }
 
     return (
@@ -25,8 +35,8 @@ function ChatRoom(props: ChatRoomProps) {
                     )}
                 </div>
             </div>
-            <form className="chat-box" onSubmit={onSubmit}>
-                <textarea ref={textareaRef}></textarea>
+            <form ref={formRef} className="chat-box" onSubmit={onSubmit}>
+                <textarea ref={textareaRef} onKeyDown={sendOnEnterKey}></textarea>
                 <button type="submit">Send</button>
             </form>
         </div>

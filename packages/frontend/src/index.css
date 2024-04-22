@@ -1,3 +1,9 @@
+:root {
+  --default-text-color: #DEE3E5;
+  --user-username-color: #55B6C4;
+  --assistant-username-color: #D3835C;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -5,6 +11,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  color: var(--default-text-color);
 }
 
 * {

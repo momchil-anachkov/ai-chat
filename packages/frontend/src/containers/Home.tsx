@@ -2,16 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import './Home.css';
 import ChatRoom from '../components/ChatRoom';
 import {ChatMessage} from '../chat.types';
+import {ChatRoomNames} from '../chat-room-names';
 
 function Home() {
-    const [chatRoomsState, setChatRoomsState] = useState<{[name: string]: ChatMessage[] }>({ humans: [], robots: [] });
+    const [chatRoomsState, setChatRoomsState] = useState<{ [name: string]: ChatMessage[] }>({humans: [], robots: []});
     const [username] = useState(window.crypto.randomUUID().split('-')[0]);
 
     const wsRef = useRef<WebSocket>(null as unknown as WebSocket);
 
     useEffect(() => {
-        // React.Strict renders twice
-
         if (!wsRef.current) {
             const ws = new WebSocket('wss://localhost:4000');
             wsRef.current = ws;
@@ -20,46 +19,48 @@ function Home() {
                 try {
                     const message = JSON.parse(wsMessage.data);
 
-                    if (message.event === 'message') {
-                        const chatRoom: string = message.data.room;
-
-                        setChatRoomsState((currentChatRoomState: { [name: string]: ChatMessage[] }): {[name: string]: ChatMessage[]} => {
-                            if (currentChatRoomState[chatRoom]) {
-                                currentChatRoomState[chatRoom].push(message.data);
-                                return {...currentChatRoomState};
-                            } else {
-                                return currentChatRoomState;
-                            }
-                        });
+                    if (message.event === 'chat-message') {
+                        receiveChatMessage(message.data);
                     }
 
                     if (message.event === 'chat-history') {
-                        const chatMessages = message.data;
-                        // const chatMessages = message.data.map((message: any) => ({ user: message.username, text: message.text, room: message.room, role: message.role }));
-                        const humansChatMessages = chatMessages.filter((message: any) => message.room === 'humans');
-                        const robotsChatMessages = chatMessages.filter((message: any) => message.room === 'robots');
-
-                        console.log(humansChatMessages);
-                        console.log(robotsChatMessages);
-
-                        setChatRoomsState({ humans: humansChatMessages, robots: robotsChatMessages });
+                        receiveChatHistory(message.data);
                     }
-
                 } catch (e) {
                     console.error(e);
                 }
             });
         }
-    }, [])
+    }, []);
 
-    function onMessageSend(room: string, message: string) {
-        // fetch('https://localhost:4000').then((response) => response.text()).then(console.log);
+    function receiveChatHistory(messages: ChatMessage[]) {
+        const humansChatMessages = messages.filter((message: any) => message.room === ChatRoomNames.HUMANS);
+        const robotsChatMessages = messages.filter((message: any) => message.room === ChatRoomNames.ROBOTS);
+        setChatRoomsState({humans: humansChatMessages, robots: robotsChatMessages});
+    }
+
+    function receiveChatMessage(message: ChatMessage) {
+        const chatRoom: string = message.room;
+
+        setChatRoomsState((currentChatRoomState: { [name: string]: ChatMessage[] }): { [name: string]: ChatMessage[] } => {
+            if (currentChatRoomState[chatRoom]) {
+                return {
+                    ...currentChatRoomState,
+                    [chatRoom]: [...currentChatRoomState[chatRoom], message]
+                };
+            } else {
+                return currentChatRoomState;
+            }
+        });
+    }
+
+    function sendChatMessage(room: string, message: string) {
         wsRef.current.send(
             JSON.stringify({
-                event: 'message',
+                event: 'chat-message',
                 data: {
                     room,
-                    message: { user: username, text: message },
+                    message: {user: username, text: message},
                 },
             }),
         );
@@ -68,12 +69,12 @@ function Home() {
     return (
         <React.Fragment>
             <div className="Home">
-                <div className="username">Username: {username}</div>
+                <div className="username-box"><span className="username">Username</span>: {username}</div>
                 <div className="chatroom-humans">
                     <ChatRoom
                         watermark="humans"
                         roomId="humans"
-                        onMessageSend={onMessageSend}
+                        onMessageSend={sendChatMessage}
                         messages={chatRoomsState.humans}
                     ></ChatRoom>
                 </div>
@@ -81,7 +82,7 @@ function Home() {
                     <ChatRoom
                         watermark="humans & robots"
                         roomId="robots"
-                        onMessageSend={onMessageSend}
+                        onMessageSend={sendChatMessage}
                         messages={chatRoomsState.robots}
                     ></ChatRoom>
                 </div>

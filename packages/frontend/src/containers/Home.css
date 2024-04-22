@@ -16,7 +16,7 @@
 .username {
     grid-area: username;
     /*FIXME: We have duplicate css values. (Like Below) Use CSS variables.*/
-    color: #DEE3E5;
+    color: var(--user-username-color);
 }
 
 .chatroom-humans {
