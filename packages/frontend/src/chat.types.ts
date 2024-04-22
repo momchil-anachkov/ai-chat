@@ -1,6 +1,5 @@
-interface WsMessage {
-    room: string;
-    message: ChatMessage
+export interface ChatHistory {
+    [room: string]: ChatMessage[]
 }
 
 export interface ChatMessage {

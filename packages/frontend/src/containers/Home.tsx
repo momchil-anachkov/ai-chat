@@ -1,8 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './Home.css';
 import ChatRoom from '../components/ChatRoom';
-import {ChatMessage} from '../chat.types';
-import {ChatRoomNames} from '../chat-room-names';
+import {ChatHistory, ChatMessage} from '../chat.types';
 
 function Home() {
     const [chatRoomsState, setChatRoomsState] = useState<{ [name: string]: ChatMessage[] }>({humans: [], robots: []});
@@ -33,10 +32,8 @@ function Home() {
         }
     }, []);
 
-    function receiveChatHistory(messages: ChatMessage[]) {
-        const humansChatMessages = messages.filter((message: any) => message.room === ChatRoomNames.HUMANS);
-        const robotsChatMessages = messages.filter((message: any) => message.room === ChatRoomNames.ROBOTS);
-        setChatRoomsState({humans: humansChatMessages, robots: robotsChatMessages});
+    function receiveChatHistory(messages: ChatHistory) {
+        setChatRoomsState(messages);
     }
 
     function receiveChatMessage(message: ChatMessage) {

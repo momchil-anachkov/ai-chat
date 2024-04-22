@@ -71,9 +71,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     async handleConnection(client: WebSocket, ...args: any[]): Promise<void> {
         this.connectedClients.add(client);
-        // FIXME: The format here is kind of crap. Maybe have an object with a field for each room
-        const allMessages = this.roomToChatMessages.get('humans').concat(this.roomToChatMessages.get('robots'));
-        this.sendMessage(client, { event: CHAT_HISTORY, data: allMessages });
+        const chatHistory = {
+            [ChatRoomNames.HUMANS]: this.roomToChatMessages.get(ChatRoomNames.HUMANS),
+            [ChatRoomNames.ROBOTS]: this.roomToChatMessages.get(ChatRoomNames.ROBOTS),
+        }
+        this.sendMessage(client, { event: CHAT_HISTORY, data: chatHistory });
     }
 
     handleDisconnect(client: any): any {
